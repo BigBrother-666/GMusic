@@ -22,7 +22,7 @@ public class NBSConverter {
 		this.gMusicMain = gMusicMain;
 	}
 
-	public boolean convertNBSFile(File nbsFile) {
+	public boolean convertNBSFile(File nbsFile, File gnbsFile) {
 		try {
 			DataInputStream dataInput = new DataInputStream(Files.newInputStream(nbsFile.toPath()));
 
@@ -96,9 +96,12 @@ public class NBSConverter {
 
 					// Combine the layer volume with the noteblock volume
 					// If the layer panning is not center, combine the layer & noteblock direction
-					v = (layerVolumes.get(currentLayer) * v) / 100;
-					if(layerDirections.get(currentLayer) != 100) {
-						p = (layerDirections.get(currentLayer) + p) / 2;
+					// Layer info may be missing (e.g. header layer count is 0), fall back to defaults
+					if(currentLayer >= 0 && currentLayer < layerVolumes.size()) {
+						v = (layerVolumes.get(currentLayer) * v) / 100;
+						if(layerDirections.get(currentLayer) != 100) {
+							p = (layerDirections.get(currentLayer) + p) / 2;
+						}
 					}
 
 					String contentPart = i + ":" + v + ":#" + (k - 33) + (p == 100 ? "" : ":" + p);
@@ -136,11 +139,7 @@ public class NBSConverter {
 				dataInput.readByte();
 			}
 
-			String gnbsFilename = nbsFile.getName();
-			int extensionPos = gnbsFilename.lastIndexOf(".");
-			if(extensionPos != -1) gnbsFilename = gnbsFilename.substring(0, extensionPos);
-
-			File gnbsFile = new File(gMusicMain.getDataFolder(), SongService.GNBS_FOLDER + "/" + gnbsFilename + "." + SongService.GNBS_EXTENSION);
+			if(gnbsFile.getParentFile() != null) gnbsFile.getParentFile().mkdirs();
 
 			YamlConfiguration gnbsStruct = YamlConfiguration.loadConfiguration(gnbsFile);
 
@@ -159,7 +158,10 @@ public class NBSConverter {
 			gnbsStruct.save(gnbsFile);
 
 			return true;
-		} catch(Throwable e) { gMusicMain.getLogger().log(Level.SEVERE, "Could not convert nbs file to " + SongService.GNBS_EXTENSION + " file!", e); }
+		} catch(Throwable e) {
+			gMusicMain.getLogger().log(Level.SEVERE, "Could not convert nbs file to " + SongService.GNBS_EXTENSION + " file!", e);
+			gMusicMain.getLogger().log(Level.SEVERE, "file path: " + nbsFile.getPath());
+		}
 
 		return false;
 	}

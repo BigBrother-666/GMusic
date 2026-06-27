@@ -268,15 +268,11 @@ public class MidiConverter {
 
 	private record MidiPair(NoteInstrument instrument, int octaveShift) { }
 
-	public boolean convertMidiFile(File midiFile) {
+	public boolean convertMidiFile(File midiFile, File gnbsFile) {
 		try {
 			Map.Entry<List<String>, List<Integer>> gnbsContent = readMidiFile(midiFile);
 
-			String gnbsFilename = midiFile.getName();
-			int extensionPos = gnbsFilename.lastIndexOf(".");
-			if(extensionPos != -1) gnbsFilename = gnbsFilename.substring(0, extensionPos);
-
-			File gnbsFile = new File(gMusicMain.getDataFolder(), SongService.GNBS_FOLDER + "/" + gnbsFilename + "." + SongService.GNBS_EXTENSION);
+			if(gnbsFile.getParentFile() != null) gnbsFile.getParentFile().mkdirs();
 			YamlConfiguration gnbsStruct = YamlConfiguration.loadConfiguration(gnbsFile);
 
 			String title = midiFile.getName().replaceFirst("[.][^.]+$", "");

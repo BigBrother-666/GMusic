@@ -46,9 +46,16 @@ public class SongService {
         File gnbsDir = new File(gMusicMain.getDataFolder(), GNBS_FOLDER);
         if(!gnbsDir.exists()) return;
 
-        File[] songFiles = gnbsDir.listFiles();
-        if(songFiles == null) return;
-        for(File file : songFiles) loadSongFile(file);
+        loadSongFolder(gnbsDir);
+    }
+
+    private void loadSongFolder(@NotNull File dir) {
+        File[] files = dir.listFiles();
+        if(files == null) return;
+        for(File file : files) {
+            if(file.isDirectory()) loadSongFolder(file);
+            else loadSongFile(file);
+        }
     }
 
     public boolean loadSongFile(@NotNull File file) {
@@ -56,7 +63,7 @@ public class SongService {
         if(extensionPos <= 0 || !file.getName().substring(extensionPos + 1).equalsIgnoreCase(GNBS_EXTENSION)) return false;
 
         try {
-            Song song = new Song(file);
+            Song song = new Song(file, getGnbsRelativeName(file));
             if(song.getNoteAmount() == 0) {
                 gMusicMain.getLogger().warning("Could not load " + GNBS_EXTENSION + " music '" + file.getName().substring(0, extensionPos) + "', no notes found");
                 return false;
@@ -72,6 +79,17 @@ public class SongService {
 
     public void unloadSongs() {
         songs.clear();
+    }
+
+    private String getGnbsRelativeName(@NotNull File file) {
+        File gnbsDir = new File(gMusicMain.getDataFolder(), GNBS_FOLDER);
+        String filePath = file.getAbsolutePath();
+        String gnbsPath = gnbsDir.getAbsolutePath();
+        if(!filePath.startsWith(gnbsPath)) return file.getName();
+
+        String relative = filePath.substring(gnbsPath.length()).replace(File.separatorChar, '/');
+        if(relative.startsWith("/")) relative = relative.substring(1);
+        return relative;
     }
 
     private void convertFolder() {
@@ -117,30 +135,50 @@ public class SongService {
             return;
         }
 
-        File[] convertFiles = convertDir.listFiles();
+        convertSongFolder(convertDir);
+    }
+
+    private void convertSongFolder(@NotNull File dir) {
+        File[] convertFiles = dir.listFiles();
         if(convertFiles == null) return;
 
-        for(File file : convertFiles) convertSongFile(file);
+        for(File file : convertFiles) {
+            if(file.isDirectory()) convertSongFolder(file);
+            else convertSongFile(file);
+        }
     }
 
     public @Nullable File convertSongFile(@NotNull File file) {
+        File convertDir = new File(gMusicMain.getDataFolder(), CONVERT_FOLDER);
         File gnbsDir = new File(gMusicMain.getDataFolder(), GNBS_FOLDER);
 
-        File gnbsFile = new File(gnbsDir.getAbsolutePath() + "/" + file.getName().replaceFirst("[.][^.]+$", "") + "." + GNBS_EXTENSION);
+        String relativeParent = "";
+        File parent = file.getParentFile();
+        if(parent != null) {
+            String parentPath = parent.getAbsolutePath();
+            String convertPath = convertDir.getAbsolutePath();
+            if(parentPath.startsWith(convertPath)) {
+                relativeParent = parentPath.substring(convertPath.length()).replace(File.separatorChar, '/');
+                if(!relativeParent.isEmpty() && !relativeParent.endsWith("/")) relativeParent += "/";
+                if(relativeParent.startsWith("/")) relativeParent = relativeParent.substring(1);
+            }
+        }
+
+        File gnbsFile = new File(gnbsDir, relativeParent + file.getName().replaceFirst("[.][^.]+$", "") + "." + GNBS_EXTENSION);
         if(gnbsFile.exists()) return gnbsFile;
 
         String extension = file.getName().substring(file.getName().lastIndexOf(".") + 1);
         switch(extension.toLowerCase()) {
             case MID_EXTENSION:
             case MIDI_EXTENSION:
-                if(gMusicMain.getMidiConverter().convertMidiFile(file)) return gnbsFile;
+                if(gMusicMain.getMidiConverter().convertMidiFile(file, gnbsFile)) return gnbsFile;
                 return null;
             case NBS_EXTENSION: {
-                if(gMusicMain.getNBSConverter().convertNBSFile(file)) return gnbsFile;
+                if(gMusicMain.getNBSConverter().convertNBSFile(file, gnbsFile)) return gnbsFile;
                 return null;
             }
             case WAV_EXTENSION: {
-                if(gMusicMain.getWavConverter().convertWavFile(file)) return gnbsFile;
+                if(gMusicMain.getWavConverter().convertWavFile(file, gnbsFile)) return gnbsFile;
                 return null;
             }
             default:

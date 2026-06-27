@@ -28,9 +28,11 @@ public class Song {
 	private long noteAmount = 0;
 	private long length = 0;
 
-    public Song(File gnbsFile) {
+    public Song(File gnbsFile) { this(gnbsFile, gnbsFile.getName()); }
+
+    public Song(File gnbsFile, String relativeName) {
         YamlConfiguration config = YamlConfiguration.loadConfiguration(gnbsFile);
-		filename = gnbsFile.getName();
+		filename = relativeName;
 
 		id = config.getString("Song.Id");
 		title = config.getString("Song.Title", id);
