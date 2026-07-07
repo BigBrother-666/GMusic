@@ -28,6 +28,17 @@ allprojects {
     tasks.javadoc {
         options.encoding = "UTF-8"
     }
+
+    // Some recent Paper dev-bundle snapshots declare net.kyori:adventure-text-serializer-ansi without a
+    // version, which breaks resolution of every configuration that includes it. Supply the missing version,
+    // aligned with the adventure version those bundles resolve for their other adventure artifacts.
+    configurations.configureEach {
+        resolutionStrategy.eachDependency {
+            if(requested.group == "net.kyori" && requested.name == "adventure-text-serializer-ansi" && requested.version.isNullOrEmpty()) {
+                useVersion("4.26.1")
+            }
+        }
+    }
 }
 
 dependencies {
