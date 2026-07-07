@@ -12,6 +12,9 @@ dependencies {
     compileOnly("me.clip:placeholderapi:2.12.2")
     compileOnly("com.github.GriefPrevention:GriefPrevention:18.0.0")
     compileOnly("com.intellectualsites.plotsquared:plotsquared-core:7.5.13")
+    compileOnly("com.github.MilkBowl:VaultAPI:1.7.1") {
+        exclude("org.bukkit", "bukkit")
+    }
 }
 
 java {

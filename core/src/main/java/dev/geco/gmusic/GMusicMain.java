@@ -14,6 +14,7 @@ import dev.geco.gmusic.event.PlayerEventHandler;
 import dev.geco.gmusic.link.GriefPreventionLink;
 import dev.geco.gmusic.link.PlaceholderAPILink;
 import dev.geco.gmusic.link.PlotSquaredLink;
+import dev.geco.gmusic.link.VaultLink;
 import dev.geco.gmusic.link.WorldGuardLink;
 import dev.geco.gmusic.metric.BStatsMetric;
 import dev.geco.gmusic.service.ConfigService;
@@ -71,6 +72,7 @@ public class GMusicMain extends JavaPlugin {
     private GriefPreventionLink griefPreventionLink;
     private PlaceholderAPILink placeholderAPILink;
     private PlotSquaredLink plotSquaredLink;
+    private VaultLink vaultLink;
     private WorldGuardLink worldGuardLink;
     private BStatsMetric bStatsMetric;
     private boolean supportsTaskFeature = false;
@@ -120,6 +122,8 @@ public class GMusicMain extends JavaPlugin {
     public PlaceholderAPILink getPlaceholderAPILink() { return placeholderAPILink; }
 
     public PlotSquaredLink getPlotSquaredLink() { return plotSquaredLink; }
+
+    public VaultLink getVaultLink() { return vaultLink; }
 
     public WorldGuardLink getWorldGuardLink() { return worldGuardLink; }
 
@@ -291,6 +295,12 @@ public class GMusicMain extends JavaPlugin {
             if(!plotSquaredLink.isPlotSquaredVersionSupported()) plotSquaredLink = null;
         } else plotSquaredLink = null;
 
+        plugin = Bukkit.getPluginManager().getPlugin("Vault");
+        if(plugin != null && plugin.isEnabled() && configService.DISC_BUY_ENABLED) {
+            vaultLink = new VaultLink(this);
+            if(!vaultLink.hasEconomy()) vaultLink = null;
+        } else vaultLink = null;
+
         plugin = Bukkit.getPluginManager().getPlugin("WorldGuard");
         if(plugin != null && plugin.isEnabled()) {
             if(worldGuardLink == null) {
@@ -305,6 +315,7 @@ public class GMusicMain extends JavaPlugin {
         if(griefPreventionLink != null) messageService.sendMessage(sender, "Plugin.plugin-link", "%Link%", Bukkit.getPluginManager().getPlugin("GriefPrevention").getName());
         if(placeholderAPILink != null) messageService.sendMessage(sender, "Plugin.plugin-link", "%Link%", Bukkit.getPluginManager().getPlugin("PlaceholderAPI").getName());
         if(plotSquaredLink != null) messageService.sendMessage(sender, "Plugin.plugin-link", "%Link%", Bukkit.getPluginManager().getPlugin("PlotSquared").getName());
+        if(vaultLink != null) messageService.sendMessage(sender, "Plugin.plugin-link", "%Link%", Bukkit.getPluginManager().getPlugin("Vault").getName());
         if(worldGuardLink != null) messageService.sendMessage(sender, "Plugin.plugin-link", "%Link%", Bukkit.getPluginManager().getPlugin("WorldGuard").getName());
     }
 

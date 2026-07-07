@@ -279,6 +279,12 @@ public class MusicGUI {
 							setPage(page);
 							return;
 						}
+						if(click == ClickType.SHIFT_LEFT && type == MenuType.DEFAULT && gMusicMain.getConfigService().DISC_BUY_ENABLED) {
+							Player buyer = Bukkit.getPlayer(uuid);
+							if(buyer == null) return;
+							buyDisc(buyer, song);
+							return;
+						}
 						switch(type) {
 							case DEFAULT -> {
 								Player target = Bukkit.getPlayer(uuid);
@@ -504,6 +510,7 @@ public class MusicGUI {
 				List<String> description = new ArrayList<>();
 				for(String descriptionRow : song.getDescription()) description.add(gMusicMain.getMessageService().toFormattedMessage("&6" + descriptionRow));
 				if(playSettings.getFavorites().contains(song)) description.add(gMusicMain.getMessageService().getMessage("MusicGUI.disc-favorite"));
+				if(type == MenuType.DEFAULT && gMusicMain.getConfigService().DISC_BUY_ENABLED) description.addAll(gMusicMain.getMessageService().getMessageList("MusicGUI.disc-buy-lore", "%Price%", getFormattedBuyPrice()));
 				itemMeta.setLore(description);
 				pageSongs.put(songPosition % 45, song);
 				itemMeta.addItemFlags(ItemFlag.values());
@@ -542,6 +549,39 @@ public class MusicGUI {
 	}
 
 	private int getMaxPageSize(int songCount) { return (songCount / 45) + (songCount % 45 == 0 ? 0 : 1); }
+
+	private String getFormattedBuyPrice() {
+		double price = gMusicMain.getConfigService().DISC_BUY_PRICE;
+		if(gMusicMain.getVaultLink() != null) return gMusicMain.getVaultLink().format(price);
+		return "" + price;
+	}
+
+	private void buyDisc(@NotNull Player buyer, @NotNull Song song) {
+		if(!gMusicMain.getPermissionService().hasPermission(buyer, "Music.Buy", "Music.*")) {
+			gMusicMain.getMessageService().sendMessage(buyer, "Messages.command-gmusic-buy-permission-error");
+			return;
+		}
+
+		if(gMusicMain.getVaultLink() == null) {
+			gMusicMain.getMessageService().sendMessage(buyer, "Messages.command-gmusic-buy-economy-error");
+			return;
+		}
+
+		double price = gMusicMain.getConfigService().DISC_BUY_PRICE;
+		if(!gMusicMain.getVaultLink().has(buyer, price)) {
+			gMusicMain.getMessageService().sendMessage(buyer, "Messages.command-gmusic-buy-funds-error", "%Price%", getFormattedBuyPrice());
+			return;
+		}
+
+		if(!gMusicMain.getVaultLink().withdraw(buyer, price)) {
+			gMusicMain.getMessageService().sendMessage(buyer, "Messages.command-gmusic-buy-economy-error");
+			return;
+		}
+
+		ItemStack disc = gMusicMain.getDiscService().createDiscItem(song);
+		for(ItemStack overflow : buyer.getInventory().addItem(disc).values()) buyer.getWorld().dropItem(buyer.getLocation(), overflow);
+		gMusicMain.getMessageService().sendMessage(buyer, "Messages.command-gmusic-buy", "%Song%", song.getId(), "%SongTitle%", song.getTitle(), "%Price%", getFormattedBuyPrice());
+	}
 
 	public @NotNull UUID getOwner() { return uuid; }
 

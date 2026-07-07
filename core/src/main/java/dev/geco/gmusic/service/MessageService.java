@@ -14,8 +14,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -80,6 +82,16 @@ abstract public class MessageService {
     abstract public void sendMessage(@NotNull CommandSender target, String message, Object... replaceList);
 
     abstract public void sendActionBarMessage(@NotNull Player target, String message, Object... replaceList);
+
+    public List<String> getMessageList(String message, Object... replaceList) { return getMessageList(message, null, replaceList); }
+
+    public List<String> getMessageList(String message, Entity entity, Object... replaceList) {
+        String languageCode = getLanguageForTarget(entity);
+        List<String> rawList = message == null || message.isEmpty() ? List.of() : getMessages(languageCode).getStringList(message);
+        List<String> formatted = new ArrayList<>(rawList.size());
+        for(String row : rawList) formatted.add(toFormattedMessage(replaceWithLanguageCode(row, languageCode, replaceList)));
+        return formatted;
+    }
 
     public String getMessage(String message, Object... replaceList) { return getMessage(message, null, replaceList); }
 

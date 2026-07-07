@@ -7,7 +7,7 @@ main: ${main}
 api-version: 1.13
 folia-supported: true
 source: ${source}
-softdepend: [GriefPrevention, PlaceholderAPI, PlotSquared, WorldGuard]
+softdepend: [GriefPrevention, PlaceholderAPI, PlotSquared, Vault, WorldGuard]
 
 commands:
   gmusic:
@@ -53,6 +53,7 @@ permissions:
       GMusic.Music.Resume: true
       GMusic.Music.Skip: true
       GMusic.Music.Toggle: true
+      GMusic.Music.Buy: true
 
   GMusic.Music:
     default: true
@@ -89,6 +90,10 @@ permissions:
   GMusic.Music.Toggle:
     default: true
     description: Music Toggle command | Permission
+
+  GMusic.Music.Buy:
+    default: true
+    description: Music Buy disc | Permission
 
   GMusic.JukeBox:
     default: true

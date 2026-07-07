@@ -72,3 +72,10 @@ Options:
     disable-playlist: false
     disable-options: false
     disable-search: false
+
+  Disc:
+    # Defines whether players can buy discs from the music menu (shift + left click), requires Vault and an economy plugin
+    buy-enabled: false
+
+    # Defines the price for buying a disc from the music menu
+    buy-price: 100.0

@@ -25,6 +25,10 @@ Messages:
   command-gmusic-paused-error: "[P]&c There is currently no paused song!"
   command-gmusic-pause: "[P]&a Song paused."
   command-gmusic-resume: "[P]&a Song resumed."
+  command-gmusic-buy: "[P]&a You bought the disc&6 %SongTitle%&a for&6 %Price%&a."
+  command-gmusic-buy-permission-error: "[P]&c You don't have permission to buy discs!"
+  command-gmusic-buy-economy-error: "[P]&c Buying discs is currently not available!"
+  command-gmusic-buy-funds-error: "[P]&c You need&6 %Price%&c to buy this disc!"
 
   command-gadminmusic-use-error: "[P]&c /adminmusic jukebox|disc|download|radio|edit|play|playing|random|stop|pause|resume|skip|toggle"
   command-gadminmusic-target-error: "[P]&6 %Target%&c is not a valid target!"
@@ -108,6 +112,9 @@ MusicGUI:
   disc-empty-author: "Unknown"
   disc-empty-original-author: "Unknown"
   disc-favorite: "&cFavorite"
+  disc-buy-lore:
+  - ""
+  - "&aLeft click to play&6 Shift + Left click to buy"
 
 Items:
   jukebox-title: "&cJukeBox"

@@ -25,6 +25,10 @@ Messages:
   command-gmusic-paused-error: "[P]&c Es ist aktuell kein Song pausiert!"
   command-gmusic-pause: "[P]&a Song pausiert."
   command-gmusic-resume: "[P]&a Song fortgesetzt."
+  command-gmusic-buy: "[P]&a Du hast die Schallplatte&6 %SongTitle%&a für&6 %Price%&a gekauft."
+  command-gmusic-buy-permission-error: "[P]&c Du hast keine Berechtigung, Schallplatten zu kaufen!"
+  command-gmusic-buy-economy-error: "[P]&c Der Kauf von Schallplatten ist aktuell nicht verfügbar!"
+  command-gmusic-buy-funds-error: "[P]&c Du benötigst&6 %Price%&c, um diese Schallplatte zu kaufen!"
 
   command-gadminmusic-use-error: "[P]&c /adminmusic jukebox|disc|download|radio|edit|play|playing|random|stop|pause|resume|skip|toggle"
   command-gadminmusic-target-error: "[P]&6 %Target%&c ist kein valides Ziel!"
@@ -108,6 +112,9 @@ MusicGUI:
   disc-empty-author: "Unbekannt"
   disc-empty-original-author: "Unbekannt"
   disc-favorite: "&cFavorit"
+  disc-buy-lore:
+  - ""
+  - "&aLinksklick zum Abspielen&6 Shift + Linksklick zum Kaufen"
 
 Items:
   jukebox-title: "&cJukeBox"
